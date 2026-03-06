@@ -1,0 +1,28 @@
+{
+  "name": "eliasr2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EliasJindi/GIK2XK-Grupp-25--projekt-Elias-Riktiga.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/EliasJindi/GIK2XK-Grupp-25--projekt-Elias-Riktiga/issues"
+  },
+  "homepage": "https://github.com/EliasJindi/GIK2XK-Grupp-25--projekt-Elias-Riktiga#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.19.0",
+    "sequelize": "^6.37.7"
+  }
+}
