@@ -9,38 +9,23 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import CommentIcon from '@mui/icons-material/Comment';
 
 function ProductCard({ product, onAddToCart }) {
-  // State för lokala funktioner
   const [quantity, setQuantity] = useState(1);
   const [openComments, setOpenComments] = useState(false);
-  
-  // State för ny fältrapport (recension)
   const [userRating, setUserRating] = useState(5);
   const [userComment, setUserComment] = useState("");
 
-  // Justera antal (plus/minus)
   const adjustQty = (val) => {
     if (quantity + val >= 1) setQuantity(quantity + val);
   };
 
-  // Skicka fältrapport till Backend
   const handleReviewSubmit = () => {
-    const reviewData = {
-      productId: product.id,
-      rating: userRating,
-      comment: userComment,
-      userId: 1 // Hårdkodat till General Elias (ID 1)
-    };
-
     fetch('http://localhost:5000/ratings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(reviewData)
+      body: JSON.stringify({ productId: product.id, rating: userRating, comment: userComment, userId: 1 })
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(() => {
       alert("Fältrapport skickad!");
-      setUserComment(""); 
-      setOpenComments(false);
       window.location.reload(); 
     })
     .catch(err => console.error("Kunde inte skicka recension:", err));
@@ -50,35 +35,20 @@ function ProductCard({ product, onAddToCart }) {
 
   return (
     <>
-      <Card sx={{ 
-        maxWidth: 320, 
-        m: 2, 
-        bgcolor: '#1b2613', 
-        color: '#f2e8cf', 
-        border: '1px solid #4b5320',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
-      }}>
-        {/* ÄNDRING HÄR: Vi använder product.image_url för att matcha databasen */}
+      <Card sx={{ maxWidth: 320, m: 2, bgcolor: '#1b2613', color: '#f2e8cf', border: '1px solid #4b5320', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
         <CardMedia 
           component="img" 
           height="180" 
-         image={product.image_url || 'https://via.placeholder.com/400x200?text=MATERIEL+SAKNAS'}
+          image={product.image_url || 'https://via.placeholder.com/400x200?text=MATERIEL+SAKNAS'} 
           alt={product.title} 
         />
-        
         <CardContent>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
-            {product.title}
-          </Typography>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>{product.title}</Typography>
           
           <Box sx={{ display: 'flex', alignItems: 'center', my: 1 }}>
-            <Rating 
-              value={product.averageRating || 0} 
-              precision={0.5} 
-              readOnly 
-              size="small" 
-              sx={{ color: '#ff4400' }} 
-            />
+            <Rating value={product.averageRating || 0} precision={0.5} readOnly size="small" sx={{ color: '#ff4400' }} />
+            
+            {/* HÄR ÄR DIN RECENSIONS-KNAPP ELIAS! */}
             <Button 
               size="small" 
               startIcon={<CommentIcon />}
@@ -93,40 +63,20 @@ function ProductCard({ product, onAddToCart }) {
             {product.price ? product.price.toLocaleString() : 0} kr
           </Typography>
           
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between', 
-            mb: 2, 
-            bgcolor: '#0d1109', 
-            p: 0.5, 
-            borderRadius: 1,
-            border: '1px solid #4b5320'
-          }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, bgcolor: '#0d1109', p: 0.5, borderRadius: 1, border: '1px solid #4b5320' }}>
             <IconButton onClick={() => adjustQty(-1)} sx={{ color: '#f2e8cf' }}><RemoveIcon /></IconButton>
             <Typography sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{quantity}</Typography>
             <IconButton onClick={() => adjustQty(1)} sx={{ color: '#f2e8cf' }}><AddIcon /></IconButton>
           </Box>
 
-          <Button 
-            variant="contained" 
-            fullWidth 
-            onClick={() => onAddToCart(product, quantity)}
-            sx={{ bgcolor: '#4b5320', fontWeight: 'bold', '&:hover': { bgcolor: '#5c6628' } }}
-          >
+          <Button variant="contained" fullWidth onClick={() => onAddToCart(product, quantity)} sx={{ bgcolor: '#4b5320', fontWeight: 'bold' }}>
             LÄGG TILL I ORDER
           </Button>
         </CardContent>
       </Card>
 
-      <Dialog 
-        open={openComments} 
-        onClose={() => setOpenComments(false)} 
-        PaperProps={{ sx: { bgcolor: '#0d1109', color: '#f2e8cf', minWidth: '350px' } }}
-      >
-        <DialogTitle sx={{ borderBottom: '1px solid #4b5320', fontWeight: 'bold' }}>
-          FÄLTRAPPORTER: {product.title}
-        </DialogTitle>
+      <Dialog open={openComments} onClose={() => setOpenComments(false)} PaperProps={{ sx: { bgcolor: '#0d1109', color: '#f2e8cf', minWidth: '350px' } }}>
+        <DialogTitle sx={{ borderBottom: '1px solid #4b5320', fontWeight: 'bold' }}>FÄLTRAPPORTER: {product.title}</DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
           <List>
             {product.Ratings && product.Ratings.length > 0 ? (
@@ -135,9 +85,7 @@ function ProductCard({ product, onAddToCart }) {
                   <ListItemText 
                     primary={
                       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography sx={{ fontWeight: 'bold', color: '#a7bc89' }}>
-                          {rev.User?.username || 'Anonym Soldat'}
-                        </Typography>
+                        <Typography sx={{ fontWeight: 'bold', color: '#a7bc89' }}>{rev.User?.username || 'Anonym Soldat'}</Typography>
                         <Rating value={rev.score || rev.rating} size="small" readOnly sx={{ color: '#ff4400' }} />
                       </Box>
                     }
@@ -149,40 +97,12 @@ function ProductCard({ product, onAddToCart }) {
               <Typography sx={{ py: 2, fontStyle: 'italic', color: '#a7bc89' }}>Inga rapporter inkomna.</Typography>
             )}
           </List>
-
           <Divider sx={{ bgcolor: '#4b5320', my: 3 }} />
-
           <Typography variant="h6" sx={{ mb: 2, color: '#a7bc89', fontWeight: 'bold' }}>LÄMNA EN FÄLTRAPPORT</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography>Betyg:</Typography>
-              <Rating 
-                value={userRating} 
-                onChange={(event, newValue) => setUserRating(newValue)} 
-                sx={{ color: '#ff4400' }} 
-              />
-            </Box>
-            <TextField
-              label="Din kommentar"
-              multiline
-              rows={3}
-              fullWidth
-              variant="filled"
-              value={userComment}
-              onChange={(e) => setUserComment(e.target.value)}
-              sx={{ 
-                bgcolor: '#1b2613', 
-                '& .MuiInputBase-root': { color: 'white' },
-                '& .MuiFormLabel-root': { color: '#a7bc89' }
-              }}
-            />
-            <Button 
-              variant="contained" 
-              onClick={handleReviewSubmit}
-              sx={{ bgcolor: '#ff4400', fontWeight: 'bold', mb: 2 }}
-            >
-              SKICKA RAPPORT
-            </Button>
+            <Rating value={userRating} onChange={(e, n) => setUserRating(n)} sx={{ color: '#ff4400' }} />
+            <TextField label="Din kommentar" multiline rows={3} fullWidth variant="filled" value={userComment} onChange={(e) => setUserComment(e.target.value)} sx={{ bgcolor: '#1b2613', '& .MuiInputBase-root': { color: 'white' } }} />
+            <Button variant="contained" onClick={handleReviewSubmit} sx={{ bgcolor: '#ff4400', fontWeight: 'bold' }}>SKICKA RAPPORT</Button>
           </Box>
         </DialogContent>
       </Dialog>

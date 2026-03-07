@@ -46,9 +46,12 @@ app.get('/', (req, res) => res.send('Backend är 100% redo och synkad!'));
 const PORT = process.env.PORT || 5000;
 
 // alter: true uppdaterar tabellerna om du lägger till nya fält i modellerna
-sequelize.sync({ alter: true })
-  .then(() => {
+// Istället för alter: true, kör vi en vanlig sync
+sequelize.sync().then(() => {
+  app.listen(5000, () => {
+    console.log('Servern körs på port 5000');
     console.log('MySQL-databasen är synkad!');
-    app.listen(PORT, () => console.log(`Servern körs på port ${PORT}`));
-  })
-  .catch(err => console.error('Synk-fel:', err));
+  });
+}).catch(err => {
+  console.error('Kunde inte synka databasen:', err);
+});
