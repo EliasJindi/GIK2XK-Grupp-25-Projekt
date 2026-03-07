@@ -1,47 +1,63 @@
-import { Drawer, Box, Typography, List, ListItem, ListItemText, Button, Divider, IconButton } from '@mui/material';
+import React from 'react';
+import { Drawer, Box, Typography, Button, Divider, List, ListItem } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-function CartDrawer({ open, onClose, cartItems, onClearCart }) {
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+function CartDrawer({ open, onClose, cartItems, onEmptyCart, onCheckout }) {
+  // Beräkna totalsumman
+  const total = cartItems ? cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) : 0;
 
   return (
-    <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: 350, p: 3, bgcolor: '#0d1109', height: '100%', color: '#f2e8cf' }}>
-        <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', letterSpacing: 1 }}>AKTUELL ORDER</Typography>
-        <Divider sx={{ bgcolor: '#4b5320', mb: 2 }} />
-        
-        <List>
-          {cartItems.map((item, index) => (
-            <ListItem key={index} sx={{ borderBottom: '1px solid #1b2613' }}>
-              <ListItemText 
-                primary={`${item.title} (x${item.quantity})`} 
-                secondary={`${item.price * item.quantity} kr`}
-                secondaryTypographyProps={{ style: { color: '#a7bc89' } }}
-              />
-            </ListItem>
-          ))}
-        </List>
+    <Drawer 
+      anchor="right" 
+      open={open} 
+      onClose={onClose}
+      PaperProps={{
+        sx: { width: 350, bgcolor: '#0d1109', color: '#f2e8cf', p: 3, borderLeft: '1px solid #4b5320' }
+      }}
+    >
+      <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, color: '#f2e8cf' }}>
+        AKTUELL ORDER
+      </Typography>
+      <Divider sx={{ bgcolor: '#4b5320', mb: 3 }} />
 
-        {cartItems.length > 0 ? (
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h6">TOTALT: {totalPrice} kr</Typography>
-            <Button 
-              variant="outlined" 
-              color="error" 
-              fullWidth 
-              startIcon={<DeleteIcon />} 
-              onClick={onClearCart}
-              sx={{ mt: 2 }}
-            >
-              TÖM ORDER
-            </Button>
-            <Button variant="contained" color="success" fullWidth sx={{ mt: 2, bgcolor: '#4b5320' }}>
-              SLUTFÖR BESTÄLLNING
-            </Button>
-          </Box>
-        ) : (
-          <Typography sx={{ fontStyle: 'italic', color: '#a7bc89' }}>Orderlistan är tom...</Typography>
-        )}
+      <List sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        {cartItems && cartItems.map((item, index) => (
+          <ListItem key={index} sx={{ px: 0, flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}>
+            <Typography sx={{ color: '#a7bc89', fontWeight: 'bold' }}>
+              {item.title} (x{item.quantity})
+            </Typography>
+            <Typography sx={{ color: '#a7bc89', fontSize: '0.9rem' }}>
+              {/* MELLANRUM FÖR PRODUKTER I KUNDVAGNEN */}
+              {item.price.toLocaleString('sv-SE')} kr
+            </Typography>
+          </ListItem>
+        ))}
+      </List>
+
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3, color: '#f2e8cf' }}>
+          {/* MELLANRUM FÖR TOTALSUMMAN */}
+          TOTALT: {total.toLocaleString('sv-SE')} kr
+        </Typography>
+        
+        <Button 
+          variant="outlined" 
+          fullWidth 
+          startIcon={<DeleteIcon />}
+          onClick={onEmptyCart}
+          sx={{ mb: 2, borderColor: '#ff4400', color: '#ff4400', '&:hover': { bgcolor: 'rgba(255, 68, 0, 0.1)', borderColor: '#ff4400' } }}
+        >
+          TÖM ORDER
+        </Button>
+        
+        <Button 
+          variant="contained" 
+          fullWidth 
+          onClick={onCheckout}
+          sx={{ bgcolor: '#4b5320', fontWeight: 'bold', color: '#f2e8cf', '&:hover': { bgcolor: '#5c6628' } }}
+        >
+          SLUTFÖR BESTÄLLNING
+        </Button>
       </Box>
     </Drawer>
   );
