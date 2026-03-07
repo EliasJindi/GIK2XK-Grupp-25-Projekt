@@ -38,10 +38,9 @@ function ProductCard({ product, onAddToCart }) {
     })
     .then(res => res.json())
     .then(data => {
-      alert("Fältrapport skickad!"); //
+      alert("Fältrapport skickad!");
       setUserComment(""); 
       setOpenComments(false);
-      // Laddar om sidan för att visa den nya recensionen direkt
       window.location.reload(); 
     })
     .catch(err => console.error("Kunde inte skicka recension:", err));
@@ -59,10 +58,11 @@ function ProductCard({ product, onAddToCart }) {
         border: '1px solid #4b5320',
         boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
       }}>
+        {/* ÄNDRING HÄR: Vi använder product.image_url för att matcha databasen */}
         <CardMedia 
           component="img" 
           height="180" 
-          image={product.imageUrl || 'https://via.placeholder.com/400x200?text=MATERIEL+SAKNAS'} 
+         image={product.image_url || 'https://via.placeholder.com/400x200?text=MATERIEL+SAKNAS'}
           alt={product.title} 
         />
         
@@ -71,7 +71,6 @@ function ProductCard({ product, onAddToCart }) {
             {product.title}
           </Typography>
           
-          {/* Stjärnor och Knapp för Utlåtanden */}
           <Box sx={{ display: 'flex', alignItems: 'center', my: 1 }}>
             <Rating 
               value={product.averageRating || 0} 
@@ -91,10 +90,9 @@ function ProductCard({ product, onAddToCart }) {
           </Box>
 
           <Typography variant="h5" sx={{ color: '#ff4400', fontWeight: 'bold', mb: 2 }}>
-            {product.price.toLocaleString()} kr
+            {product.price ? product.price.toLocaleString() : 0} kr
           </Typography>
           
-          {/* Kvantitetsväljare */}
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -121,7 +119,6 @@ function ProductCard({ product, onAddToCart }) {
         </CardContent>
       </Card>
 
-      {/* MODAL: Läs och skriv fältrapporter */}
       <Dialog 
         open={openComments} 
         onClose={() => setOpenComments(false)} 
@@ -131,8 +128,6 @@ function ProductCard({ product, onAddToCart }) {
           FÄLTRAPPORTER: {product.title}
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
-          
-          {/* Lista med existerande recensioner */}
           <List>
             {product.Ratings && product.Ratings.length > 0 ? (
               product.Ratings.map((rev, i) => (
@@ -157,7 +152,6 @@ function ProductCard({ product, onAddToCart }) {
 
           <Divider sx={{ bgcolor: '#4b5320', my: 3 }} />
 
-          {/* Sektion för att skriva ny rapport */}
           <Typography variant="h6" sx={{ mb: 2, color: '#a7bc89', fontWeight: 'bold' }}>LÄMNA EN FÄLTRAPPORT</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -178,9 +172,8 @@ function ProductCard({ product, onAddToCart }) {
               onChange={(e) => setUserComment(e.target.value)}
               sx={{ 
                 bgcolor: '#1b2613', 
-                input: { color: 'white' }, 
-                '& .MuiFormLabel-root': { color: '#a7bc89' },
-                '& .MuiInputBase-root': { color: 'white' }
+                '& .MuiInputBase-root': { color: 'white' },
+                '& .MuiFormLabel-root': { color: '#a7bc89' }
               }}
             />
             <Button 

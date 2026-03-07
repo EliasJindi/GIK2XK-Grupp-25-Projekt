@@ -1,57 +1,45 @@
 const Product = require('../Models/product');
 const Rating = require('../Models/rating');
-const { fn, col } = require('sequelize');
+const User = require('../Models/user'); // VIKTIGT: Denna saknades!
 
-/**
- * Hämtar alla produkter och inkluderar både genomsnittsbetyg (AVG) 
- * och totalt antal röster (COUNT).
- */
 async function getAllProducts() {
   try {
-    return await Product.findAll({
-      attributes: {
-        include: [
-          // Räknar ut genomsnittet av alla 'score' i rating-tabellen
-          [fn('AVG', col('ratings.score')), 'avgRating'],
-          // Räknar ut totalt antal rader (id) i rating-tabellen för produkten
-          [fn('COUNT', col('ratings.id')), 'ratingCount']
-        ]
-      },
-      include: [{ 
-        model: Rating, 
-        attributes: [] // Vi vill bara ha uträkningarna, inte alla enskilda betyg rader
-      }],
-      group: ['product.id'] // Grupperar resultatet så vi får unika rader per produkt
+    // Vi hämtar produkterna och inkluderar alla recensioner och användarnamn
+    const products = await Product.findAll({
+      include: [
+        {
+          model: Rating,
+          include: [{ model: User, attributes: ['username'] }]
+        }
+      ]
+    });
+
+    // Formatera datan så att React förstår den
+    return products.map(product => {
+      const plain = product.get({ plain: true });
+      const ratings = plain.ratings || [];
+      
+      const total = ratings.reduce((sum, r) => sum + r.score, 0);
+      const avg = ratings.length > 0 ? total / ratings.length : 0;
+
+      return {
+        ...plain,
+        averageRating: avg,
+        Ratings: ratings // React-koden letar efter 'Ratings' med stort R
+      };
     });
   } catch (error) {
-    throw new Error('Kunde inte hämta produkter med betyg: ' + error.message);
+    console.error("Fel i productService:", error);
+    throw error;
   }
 }
 
-/**
- * Hämtar en specifik produkt baserat på ID (från din tidigare kod).
- */
 async function getById(id) {
-  try {
-    return await Product.findByPk(id);
-  } catch (error) {
-    throw new Error('Kunde inte hitta produkten: ' + error.message);
-  }
+  return await Product.findByPk(id, { include: [{ model: Rating, include: [User] }] });
 }
 
-/**
- * Admin-funktion: Skapa en ny produkt i databasen.
- */
 async function createProduct(data) {
-  try {
-    return await Product.create(data);
-  } catch (error) {
-    throw new Error('Kunde inte skapa produkten: ' + error.message);
-  }
+  return await Product.create(data);
 }
 
-module.exports = { 
-  getAllProducts, 
-  getById,
-  createProduct 
-};
+module.exports = { getAllProducts, getById, createProduct };
