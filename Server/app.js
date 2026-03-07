@@ -10,7 +10,7 @@ const Rating = require('./Models/rating');
 const Cart = require('./Models/cart');
 const CartRow = require('./Models/cart_row');
 
-// 2. RELATIONER (UML-standard)
+// 2. RELATIONER (UML-standard för att binda ihop databasen)
 User.hasMany(Cart, { foreignKey: 'user_id' });
 Cart.belongsTo(User, { foreignKey: 'user_id' });
 
@@ -20,12 +20,16 @@ Rating.belongsTo(Product, { foreignKey: 'product_id' });
 Cart.belongsToMany(Product, { through: CartRow, foreignKey: 'cart_id' });
 Product.belongsToMany(Cart, { through: CartRow, foreignKey: 'product_id' });
 
+// Koppla ihop Rating med User så vi kan se vem som skrev kommentaren
+User.hasMany(Rating, { foreignKey: 'user_id' });
+Rating.belongsTo(User, { foreignKey: 'user_id' });
+
 // 3. EXPRESS SETUP
 const app = express();
-app.use(cors());
+app.use(cors()); // Tillåter React på port 5173 att prata med Backend på port 5000
 app.use(express.json());
 
-// 4. ROUTES (Alla sektioner på plats!)
+// 4. ROUTES
 const productRoutes = require('./Routes/productRoutes');
 const userRoutes = require('./Routes/userRoutes');
 const cartRoutes = require('./Routes/cartRoutes');
@@ -41,6 +45,7 @@ app.get('/', (req, res) => res.send('Backend är 100% redo och synkad!'));
 // 5. SYNKA OCH STARTA
 const PORT = process.env.PORT || 5000;
 
+// alter: true uppdaterar tabellerna om du lägger till nya fält i modellerna
 sequelize.sync({ alter: true })
   .then(() => {
     console.log('MySQL-databasen är synkad!');

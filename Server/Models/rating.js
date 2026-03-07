@@ -11,13 +11,21 @@ const Rating = sequelize.define('rating', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  user_id: { // VIKTIGT: Lägg till denna för att koppla till Generalen
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
   score: {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: { min: 1, max: 5 }
+  },
+  comment: { // VIKTIGT: Lägg till denna för att spara din text "Riktigt stark"
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
-  underscored: true // Matchar din produktmodell
+  underscored: true // Vi behåller denna så det matchar din övriga databas
 });
 
 module.exports = Rating;

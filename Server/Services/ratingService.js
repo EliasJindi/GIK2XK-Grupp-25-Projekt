@@ -1,35 +1,31 @@
 const Rating = require('../Models/rating');
 
 /**
- * Sparar ett nytt betyg för en produkt i databasen.
- * Vi använder fältnamnet 'score' för att matcha Rating-modellen.
+ * Sparar en komplett fältrapport (betyg, kommentar och användare).
  */
-async function addRating(productId, score) {
+async function addRating(data) {
   try {
     return await Rating.create({
-      product_id: productId,
-      score: score
+      product_id: data.productId,
+      score: data.rating,     // Vi mappar 'rating' från frontenden till 'score' i DB
+      comment: data.comment,  // Här sparar vi själva texten!
+      user_id: data.userId    // Här kopplar vi det till Generalen (id: 1)
     });
   } catch (error) {
-    throw new Error('Kunde inte spara betyg: ' + error.message);
+    throw new Error('Kunde inte spara fältrapport: ' + error.message);
   }
 }
 
-/**
- * Hämtar alla enskilda betyg som lämnats för en viss produkt.
- * Bra att ha om du i framtiden vill lista alla recensioner.
- */
+// getByProduct kan vara som den är
 async function getByProduct(productId) {
   try {
     return await Rating.findAll({
-      where: { product_id: productId }
+      where: { product_id: productId },
+      include: ['User'] // Lägg till detta för att få med namnet på den som skrivit!
     });
   } catch (error) {
-    throw new Error('Kunde inte hämta betyg för produkten: ' + error.message);
+    throw new Error('Kunde inte hämta betyg: ' + error.message);
   }
 }
 
-module.exports = {
-  addRating,
-  getByProduct
-};
+module.exports = { addRating, getByProduct };
