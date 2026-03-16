@@ -1,4 +1,4 @@
-const Product = require('./Models/product');
+/*const Product = require('./Models/product');
 const sequelize = require('./config/db');
 
 const militaryProducts = [
@@ -36,4 +36,4 @@ const seed = async () => {
   }
 };
 
-seed();
+seed();*/
