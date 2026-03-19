@@ -8,23 +8,25 @@ import ProductCard from './components/ProductCard';
 import CartDrawer from './components/CartDrawer';
 import AdminPanel from './components/AdminPanel'; // Importerad AdminPanel
 
+// Skapar ett anpassat militärtema med Material UI
 const militaryTheme = createTheme({
   palette: { mode: 'dark', primary: { main: '#4b5320' }, background: { default: '#0d1109' } },
 });
 
 function App() {
+  //  STATE-HANTERING 
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false); // State för att visa admin
 
-  // Hämtar produkter
+  // Hämtar produkter från vår express-server
   useEffect(() => {
     fetch('http://localhost:5000/products')
       .then(res => res.json())
       .then(data => setProducts(data))
       .catch(err => console.error("Fel vid hämtning:", err));
-  }, [showAdmin]); // Uppdaterar listan ifall du lagt till/tagit bort något i admin!
+  }, [showAdmin]); // Uppdaterar listan ifall du lagt till/tagit bort något i admin
 
   const addToCart = (product, quantity) => {
     setCart([...cart, { ...product, quantity }]);
@@ -33,7 +35,7 @@ function App() {
 
   const clearCart = () => setCart([]);
 
-  // NY FUNKTION: Vad som händer när kunden slutför köpet
+  // Vad som händer när kunden slutför köpet
   const handleCheckout = () => {
     alert("ORDER BEKRÄFTAD!\n\nTack för ditt köp. Materielen levereras via C-17 Globemaster till angivna koordinater inom 24 timmar.");
     clearCart(); // Tömmer korgen efter köp
@@ -55,13 +57,13 @@ function App() {
             <Button 
               onClick={() => {
                 if (showAdmin) {
-                  setShowAdmin(false); // Gå tillbaka till butiken utan lösenord
+                  setShowAdmin(false); // Går tillbaka till butiken utan lösenord
                 } else {
                   // Promtar efter lösenord när man vill in i admin
                   const password = window.prompt("BEHÖRIGHET KRÄVS: Ange lösenord för Command Center");
                   if (password === "elias123") { // Ditt lösenord
                     setShowAdmin(true);
-                  } else if (password !== null) { // Om de inte tryckte "Avbryt"
+                  } else if (password !== null) { // Om de inte tryckt Avbryt
                     alert("ÅTKOMST NEKAD: Felaktigt lösenord.");
                   }
                 }
@@ -95,7 +97,7 @@ function App() {
         </Container>
       )}
 
-      {/* HÄR ÄR UPPDATERINGEN FÖR CARTDRAWER */}
+      {}
       <CartDrawer 
         open={isCartOpen} 
         onClose={() => setIsCartOpen(false)} 
